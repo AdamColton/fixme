@@ -4,6 +4,7 @@ import (
 	"encoding/gob"
 	"github.com/adamcolton/gothic/bufpool"
 	"github.com/boltdb/bolt"
+	"os"
 )
 
 var db *bolt.DB
@@ -15,6 +16,9 @@ var (
 
 func boltInit() {
 	var err error
+	if home := os.Getenv("HOME"); home != "" {
+		os.Chdir(home)
+	}
 	db, err = bolt.Open("projects.db", 0600, nil)
 	if err != nil {
 		panic(err)

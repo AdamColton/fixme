@@ -9,7 +9,7 @@ import (
 	"github.com/adamcolton/buttress/bootstrap3/csscontext"
 	"github.com/adamcolton/buttress/html"
 	"github.com/adamcolton/buttress/html/query"
-	"github.com/adamcolton/fixme"
+	"github.com/adamcolton/fixme/fixme"
 	"github.com/adamcolton/gothic/bufpool"
 	"github.com/adamcolton/socketServer"
 	"github.com/gorilla/websocket"
