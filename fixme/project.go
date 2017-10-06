@@ -354,7 +354,10 @@ func (pr ProjectRecord) Project(id []byte) *Project {
 		sendUpdate: update,
 	}
 	for _, pkgRec := range pr.Pkgs {
-		p.pkgs.add(pkgRec.Package())
+		pkg := pkgRec.Package()
+		if pkg != nil {
+			p.pkgs.add(pkg)
+		}
 	}
 	return p
 }
