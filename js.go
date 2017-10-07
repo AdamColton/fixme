@@ -63,8 +63,7 @@ var Comm = (function(){
   };
   var outputHandler = function(msg){
     UI.setMainPanelClass(classMap[msg.Type]);
-    var lines = "<p>" + msg.Data.split("\n").join("</p><p>") + "</p>";
-    UI.mainBody.innerHTML = lines;
+    UI.mainBody.innerHTML = msg.Data;
     UI.mainHeading.innerHTML = msg.Type +" : "+ msg.Package;
   };
 

@@ -62,10 +62,11 @@ func populateMainHtmlBuf() {
 
 	d := bundle.Document()
 
-	main := bundle.SinglePanel("Loading...", nil).Render()
+	pre := html.NewTag("pre")
+	pre.AddAttributes("id", "main-body")
+	main := bundle.SinglePanel("Loading...", pre).Render()
 	main.(html.TagNode).AddAttributes("id", "main-panel")
 
-	panelBody.Query(main).AddAttributes("id", "main-body")
 	panelHeading.Query(main).AddAttributes("id", "main-heading")
 
 	projName := bundle.Form()
