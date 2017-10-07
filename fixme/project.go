@@ -102,15 +102,12 @@ func (p *Project) Run() error {
 	return nil
 }
 
-type checkStep func(*Package, map[string]bool) *Package
+type checkStep func(*Package) *Package
 
-func check(pkgs []*Package, alreadyDone map[string]bool, fn checkStep) *Package {
+func check(pkgs []*Package, fn checkStep) *Package {
 	for _, pkg := range pkgs {
-		if !alreadyDone[pkg.Import] {
-			errPkg := fn(pkg, alreadyDone)
-			if errPkg != nil {
-				return errPkg
-			}
+		if errPkg := fn(pkg); errPkg != nil {
+			return errPkg
 		}
 	}
 	return nil
@@ -124,8 +121,7 @@ func (p *Project) DoUpdate() {
 	}
 
 	for i, fn := range checkOrder {
-		alreadyDone := make(map[string]bool)
-		errPkg := check(p.testOrder, alreadyDone, fn)
+		errPkg := check(p.testOrder, fn)
 		if errPkg != nil {
 			// if it's a build error, add a temporary watch to failing file
 			if i == 0 {
@@ -148,43 +144,17 @@ func (p *Project) addTempWatch(pkg *Package) {
 	}
 }
 
-func builder(pkg *Package, alreadyDone map[string]bool) *Package {
-	if alreadyDone[pkg.Import] {
-		return nil
-	}
-	alreadyDone[pkg.Import] = true
-
-	errPkg := check(pkg.dependancies, alreadyDone, builder)
-	if errPkg != nil {
-		return errPkg
-	}
-
+func builder(pkg *Package) *Package {
 	str, _ := pkg.Build()
 	if str != "" {
 		pkg.state = failBuild
 		pkg.Data = str
 		return pkg
 	}
-
-	errPkg = check(pkg.dependants, alreadyDone, builder)
-	if errPkg != nil {
-		return errPkg
-	}
-
 	return nil
 }
 
-func tester(pkg *Package, alreadyDone map[string]bool) *Package {
-	if alreadyDone[pkg.Import] {
-		return nil
-	}
-	alreadyDone[pkg.Import] = true
-
-	errPkg := check(pkg.dependancies, alreadyDone, tester)
-	if errPkg != nil {
-		return errPkg
-	}
-
+func tester(pkg *Package) *Package {
 	str, _ := pkg.Test()
 	strs := strings.Split(str, "\n")
 	if len(strs) >= 3 && strings.TrimSpace(strs[len(strs)-3]) != "PASS" {
@@ -193,34 +163,15 @@ func tester(pkg *Package, alreadyDone map[string]bool) *Package {
 		return pkg
 	}
 
-	errPkg = check(pkg.dependants, alreadyDone, tester)
-	if errPkg != nil {
-		return errPkg
-	}
 	return nil
 }
 
-func linter(pkg *Package, alreadyDone map[string]bool) *Package {
-	if alreadyDone[pkg.Import] {
-		return nil
-	}
-	alreadyDone[pkg.Import] = true
-
-	errPkg := check(pkg.dependancies, alreadyDone, linter)
-	if errPkg != nil {
-		return errPkg
-	}
-
+func linter(pkg *Package) *Package {
 	str, _ := pkg.Linter()
 	if str != "" {
 		pkg.state = failLint
 		pkg.Data = str
 		return pkg
-	}
-
-	errPkg = check(pkg.dependants, alreadyDone, linter)
-	if errPkg != nil {
-		return errPkg
 	}
 
 	return nil
