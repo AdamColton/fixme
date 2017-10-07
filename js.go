@@ -55,6 +55,22 @@ $(function(){
 });
 
 var Comm = (function(){
+  function timeStr(){
+    var t = new Date();
+    var h = t.getHours();
+    if (h<10){
+      h = "0" + h
+    }
+    var m = t.getMinutes();
+    if (m<10){
+      m = "0" + m
+    }
+    var s = t.getSeconds();
+    if (s<10){
+      s = "0" + s
+    }
+    return h+":"+m+":"+s
+  }
   var classMap = {
     "OK": "success",
     "Lint": "info",
@@ -64,7 +80,7 @@ var Comm = (function(){
   var outputHandler = function(msg){
     UI.setMainPanelClass(classMap[msg.Type]);
     UI.mainBody.innerHTML = msg.Data;
-    UI.mainHeading.innerHTML = msg.Type +" : "+ msg.Package;
+    UI.mainHeading.innerHTML = timeStr()+") "+msg.Type +" : "+ msg.Package;
   };
 
   var showPackagesWithName = function(msg){
